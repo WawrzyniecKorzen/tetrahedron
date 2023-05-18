@@ -68,7 +68,7 @@ int main()
 			}
 		}
 
-		for (float i = -depth; i < Height; i+=increment)
+		
 		
 		printf("\x1b[H");
 		for (int k = 0; k < SCREEN_X* SCREEN_Y + 1; k++)
