@@ -2,25 +2,33 @@
 #include <iostream>
 #include <cmath>
 #include <stdio.h>
+#include <iostream>
 #include <windows.h>
 
-const int SIZE = 60;
+#define M_PI 3.14159265358979323846 
+
+const int SCREEN_X = 100;
+const int SCREEN_Y = 40;
 
 
 float A, B, C;
 float x, y, z, ooz;
 int xp, yp;
-float triangleSide = 10;
+const int triangleEdge = 40;
+const int triangleHeight = (int)(1.73 * triangleEdge/2 );
+const int Height = sqrt(6) * triangleEdge / 3;
 int K2 = 60;
 float K1 = 40;
 int index;
 
-float zBuffer[SIZE*SIZE];
-char buffer[SIZE*SIZE];
+float zBuffer[SCREEN_X*SCREEN_Y];
+char buffer[SCREEN_X * SCREEN_Y];
 
 int background = ' ';
 
-float increment = 0.6;
+float increment = 0.2;
+
+bool isTriangle(float x, float y);
 
 float rotateX(int i, int j, int k);
 float rotateY(int i, int j, int k);
@@ -32,26 +40,59 @@ int main()
 {
 	A = B = C = 0;
 	printf("\x1b[2J");
+	
+	float depth = -triangleEdge / sqrt(24);
+	float edge1[3] = { -triangleEdge / 2, triangleHeight, 0 };
+	float edge2[3] = { -triangleEdge, 0, 0 };
+	float edge3[3] = { triangleEdge / 2, triangleHeight, 0 };
+
 
 	while (1)
 	{
-		memset(buffer, background, SIZE*SIZE);
-		memset(zBuffer, 0, SIZE * SIZE * 4);
 
-		//for for - to cast a triangle and call project Surface
-
-		printf("\x1b[H");
-		for (int k = 0; k < SIZE * SIZE + 1; k++)
+		memset(buffer, background, SCREEN_X*SCREEN_Y);
+		memset(zBuffer, 0, SCREEN_X * SCREEN_Y * 4);
+		
+		
+		
+		
+		for (float i = -triangleEdge/2; i <= triangleEdge/2; i+=increment)
 		{
-			putchar(k % SIZE ? buffer[k] : 10);
+			for (float j = -triangleHeight/2; j <=triangleHeight*2/3 ; j+=increment)
+			{
+				if (isTriangle(i, j))
+				{
+					projectSurface(i, j, depth, '#');
+
+				}
+			}
+		}
+
+		for (float i = -depth; i < Height; i+=increment)
+		
+		printf("\x1b[H");
+		for (int k = 0; k < SCREEN_X* SCREEN_Y + 1; k++)
+		{
+			putchar(k % SCREEN_X ? buffer[k] : 10);
 		}
 
 		A += 0.05;
 		B += 0.05;
 		C += 0.01;
-		Sleep(10);
+		Sleep(30);
+		
 	}
+
+	
 	return 0;
+}
+
+bool isTriangle(float x, float y)
+{
+	if (y <= sqrt(3) * (x - triangleEdge)/3 && y <= sqrt(3) * (-x + triangleEdge )/3)
+		return true;
+	else
+		return false;
 }
 
 float rotateX(int i, int j, int k)
@@ -75,22 +116,26 @@ float rotateZ(int i, int j, int k)
 
 void projectSurface(float X, float Y, float Z, int ch)
 {
-	//calculate x, y, z (+ distance to screen)
+	
+	x = rotateX(X, Y, Z);
+	y = rotateY(X, Y, Z);
+	z = rotateZ(X, Y, Z) + K2;
 
-
-	//projection on screen
+	
 	ooz = 1 / z;
 
-	xp = (int)(SIZE / 2 + K1 * ooz * x * 2);
-	yp = (int)(SIZE / 2 + K1 * ooz * y);
+	xp = (int)(SCREEN_X / 2 + K1 * ooz * x * 2);
+	yp = (int)(SCREEN_Y / 2 + K1 * ooz * y);
 
-	index = xp + yp * SIZE;
-	if (index >= 0 && index < SIZE * SIZE)
+	index = xp + yp * SCREEN_X;
+	if (index >= 0 && index < SCREEN_X * SCREEN_Y)
 		if (ooz > zBuffer[index])
 		{
 			zBuffer[index] = ooz;
 			buffer[index] = ch;
 		}
 }
+
+
 
 
