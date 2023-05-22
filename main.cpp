@@ -15,7 +15,7 @@ float A, B, C;
 float x, y, z, ooz;
 int xp, yp;
 const int triangleEdge = 40;
-const int triangleHeight = (int)(1.73 * triangleEdge/2 );
+const float triangleHeight = (int)(1.73 * triangleEdge/2 );
 const int Height = sqrt(6) * triangleEdge / 3;
 int K2 = 60;
 float K1 = 40;
@@ -58,7 +58,7 @@ int main()
 		
 		for (float i = -triangleEdge/2; i <= triangleEdge/2; i+=increment)
 		{
-			for (float j = -triangleHeight/2; j <=triangleHeight*2/3 ; j+=increment)
+			for (float j = -triangleHeight/3; j <=triangleHeight*2/3 ; j+=increment)
 			{
 				if (isTriangle(i, j))
 				{
@@ -89,7 +89,7 @@ int main()
 
 bool isTriangle(float x, float y)
 {
-	if (y <= sqrt(3) * (x - triangleEdge)/3 && y <= sqrt(3) * (-x + triangleEdge )/3)
+	if (y <= sqrt(3) * (x - triangleEdge/3) && y <= sqrt(3) * (-x + triangleEdge/3 ))
 		return true;
 	else
 		return false;
